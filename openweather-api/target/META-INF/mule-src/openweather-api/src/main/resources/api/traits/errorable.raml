@@ -1,0 +1,43 @@
+#%RAML 1.0 Trait
+description: Common error responses returned by an API
+usage: Apply to all operations
+
+responses:
+  400:
+    description: Bad Request-Parameter do not match the expected format/Payload Not as per Schema
+    body:
+      application/json:
+        type: !include ../schema/error.json
+
+  401:
+    description: Unauthorised Request
+
+  404:
+    description: Resource not found
+    body:
+      application/json:
+        type: !include ../schema/error.json
+
+  405:
+    description: Method Not Allowed
+    body:
+      application/json:
+        type: !include ../schema/error.json
+
+  415:
+    description: Unsupported Media Type
+    body:      
+      application/json:
+        type: !include ../schema/error.json
+
+  422:
+    description: Error Returned by OpenWeather API
+    body:      
+      application/json:
+        type: !include ../schema/error.json
+
+  500:
+    description: Internal Server Error
+    body:      
+      application/json:
+        type: !include ../schema/error.json

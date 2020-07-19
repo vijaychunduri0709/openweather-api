@@ -1,0 +1,19 @@
+listener:
+  port: "8082"
+APPID: c910f8d610e92eadedbade41466b9186
+openweather:
+  host: api.openweathermap.org
+  basepath: /data
+  path: /2.5/weather
+inputParameters:
+  firstName: firstName
+  lastName: lastName
+  city: city
+  country: country
+  citytimezone: city
+GoogleAPIKey: AIzaSyBj7T7KteyGJmW76x31VXgrDK8hOTF8DIc
+timezone:
+  host: maps.googleapis.com
+  basepath: /maps
+  path: /api/timezone/json
+celcius: "273.15"

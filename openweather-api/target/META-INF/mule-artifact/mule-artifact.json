@@ -1,0 +1,39 @@
+{
+  "configs": [
+    "globalconfigurations.xml",
+    "common.xml",
+    "openweather.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:openweather-api:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.3.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "api/openweather.raml",
+        "api/request/OpenWeatherRequest.json",
+        "api/response/OpenWeatherResponse.json",
+        "api/schema/error.json",
+        "api/schema/OpenWeatherRequestSchema.json",
+        "api/schema/OpenWeatherResponseSchema.json",
+        "api/traits/errorable.raml",
+        "application-types.xml",
+        "common.xml",
+        "config_dev.yaml",
+        "globalconfigurations.xml",
+        "log4j2.xml",
+        "modules/formatInput.dwl",
+        "openweather.xml",
+        "source/countrycode.xlsx"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

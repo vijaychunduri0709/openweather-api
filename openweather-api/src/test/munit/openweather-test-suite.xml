@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<munit:config name="openweather-test-suite.xml" />
+	<munit:test name="openweather-test-suite-post:\weather:application\json:openweather-configTest" description="Test" doc:id="38a19c74-6143-45e7-8aad-14fc98b8955f" >
+		<munit:execution >
+		<munit:set-event doc:name="Set Event" doc:id="7936f651-3003-438a-a826-bcde100f7350" >
+				<munit:payload value="#[MunitTools::getResourceAsString('request/OpenWeatherRequest.json')]" mediaType="application/json"/>
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference" doc:id="2fb5dd91-9122-469c-9290-fe14abcf3a55" name="post:\weather:application\json:openweather-config"/>
+		
+
+</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="78a4fea7-cb1c-4848-b18a-9f3204e817c5" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+</mule>

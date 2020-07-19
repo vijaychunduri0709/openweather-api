@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="openweather-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${listener.port}" />
+    </http:listener-config>
+    <apikit:config name="openweather-config" raml="openweather.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="openweather-main">
+        <http:listener config-ref="openweather-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="openweather-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="openweather-console">
+        <http:listener config-ref="openweather-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="openweather-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\weather:application\json:openweather-config">
+       	<logger level="INFO" doc:name="Log_Incoming Request" doc:id="f1cc6bba-d0f2-43be-a59f-04a94b4a4398" message="Incoming Request is :  #[payload]" />
+		<ee:transform doc:name="Set variables" doc:id="6141d6a0-b46b-42fd-82a9-8ad20f8126aa" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="APPID" ><![CDATA[%dw 2.0
+output application/json
+---
+p("APPID")]]></ee:set-variable>
+				<ee:set-variable variableName="city" ><![CDATA[%dw 2.0
+import modules::formatInput
+output application/json
+
+---
+payload.Items[formatInput::retrieveObject(payload,p("inputParameters.city"))]]]></ee:set-variable>
+				<ee:set-variable variableName="country" ><![CDATA[%dw 2.0
+import modules::formatInput
+output application/json
+
+---
+payload.Items[formatInput::retrieveObject(payload,p("inputParameters.country"))]]]></ee:set-variable>
+				<ee:set-variable variableName="firstName" ><![CDATA[%dw 2.0
+import modules::formatInput
+output application/json
+
+---
+payload.Items[formatInput::retrieveObject(payload,p("inputParameters.firstName"))]]]></ee:set-variable>
+				<ee:set-variable variableName="lastName" ><![CDATA[%dw 2.0
+import modules::formatInput
+output application/json
+
+---
+payload.Items[formatInput::retrieveObject(payload,p("inputParameters.lastName"))]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[%dw 2.0
+import * from dw::core::Strings
+output application/json
+
+---
+capitalize(vars.city) as String]" doc:name="Set variabe" doc:id="2ac470f5-8b89-4c1f-bf15-43400841894d" variableName="citytimezone"/>
+		<ee:transform doc:name="Set countrycode" doc:id="6585c436-a5d1-465b-a880-eb5bbdbf0512" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="countryCode" ><![CDATA[%dw 2.0
+var countryCode = readUrl("classpath://source/countrycode.xlsx", "application/xlsx")
+output application/json
+---
+"countryCode": (countryCode.Sheet1 filter ($.Country ~= (vars.country as String) ))[0].Code as String
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<logger level="INFO" doc:name="Log_variables" doc:id="399764a8-d2cc-4f79-b4f8-3680c25654e3" message="city,country,countrycode,firstname,lastname,citytimezone :  #[vars.city] #[vars.country] #[vars.countryCode] #[vars.firstName] #[vars.lastName] #[vars.citytimezone]" />
+		<flow-ref doc:name="Invoke_openweather request flow" doc:id="528167f5-c8b6-4ae0-be25-8cd0c7f7c1dc" name="openweatherRequest"/>
+		<ee:transform doc:name="Set OpenweatherResponse variable" doc:id="537245fe-b8c0-4915-9ef5-63906ac6ce54" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="openweatherrespoonse" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log_variables" doc:id="84f7e568-c981-474e-96be-25d9407567bc" message="city,country,countrycode,firstname,lastname,citytimezone :  #[vars.openweatherrespoonse]" />
+		<flow-ref doc:name="Invoke_GoogleTimezone API" doc:id="4062847a-93b5-4e36-a034-a4d960de4ca1" name="timezoneFlow" />
+		<ee:transform doc:name="Map_Response message" doc:id="1ee338ac-177d-45e7-82ab-88b629dd9417" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var firstName:String = vars.firstName
+var lastName:String = vars.lastName
+var celcius:Number = p("celcius") as Number
+fun kelvintoCelcius(kelvin)= kelvin - celcius
+fun calculateDateTime(dateTime)= now() >> dateTime as String 
+ 
+---
+ {      
+      "firstName": vars.firstName,
+      "lastName":vars.lastName,
+      "fullName": firstName ++ " " ++ lastName,
+      "dateTime": ((calculateDateTime(payload.timeZoneId) as LocalDateTime {format: "yyyy-MM-dd HH:mm:ss.SSS"}) + |P1D|) as String {format: "yyyy-MM-dd HH:mm:ss.SSS"},
+      "temperatureCelcius": kelvintoCelcius(vars.openweatherrespoonse.main.temp as Number) as Number {format: "#"},
+      "offset": (now() >> payload.timeZoneId) as DateTime {format: "Z"},
+      "city": vars.openweatherrespoonse.name as String,
+      "location": payload.timeZoneId as String,
+      "timeZone":payload.timeZoneName
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="be97dd0e-2b0a-44e3-8ac4-a91d5393f41e" type="ANY">
+				<ee:transform doc:name="Map_Error Message" doc:id="cf3c578f-764d-435c-a662-60f7b1e645b0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"Status": 500,
+"Message": error.description
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="reasonPhrase" ><![CDATA["Server Error"]]></ee:set-variable>
+						<ee:set-variable variableName="statusCode" ><![CDATA[500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+    </flow>
+</mule>

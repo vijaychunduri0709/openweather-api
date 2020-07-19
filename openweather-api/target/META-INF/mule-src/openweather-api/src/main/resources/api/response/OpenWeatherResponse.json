@@ -1,0 +1,11 @@
+{
+    "name": "John",
+    "lastName": "Smith",
+    "fullName": "John Smith",
+    "dateTime": "2020-07-16 00:48:15.726",
+    "temperatureCelcius": 24.72,
+    "offset": "-0400",
+    "city": "New York",
+    "location": "US",
+    "timeZone": "America/New_York"
+  }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<flow name="openweatherRequest" doc:id="affa2945-0ccf-421d-a6ad-2ea389e73de9">
+		<logger level="INFO" doc:name="Request payload logger" doc:id="d83c5774-ed27-4b19-ada1-ebb6409647b0" message="Openweather Request :  #[payload]" />
+		<http:request method="GET" doc:name="openweather API Request" doc:id="3596b5ea-adbf-40f1-a241-214fbbbc831b" path="${openweather.path}" config-ref="HTTP_Openweather_Request_configuration">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"APPID" : vars.APPID,
+	"q" : (vars.citytimezone) ++ "," ++ (vars.countryCode.countryCode)
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" message="Openweather Response :  #[payload]" doc:name="Response payload logger"/>
+	
+	
+</flow>
+
+	<flow name="timezoneFlow" doc:id="55a1b73b-15f8-4b2c-9305-efe529679946" >
+		<ee:transform doc:name="Transform Message" doc:id="e602ed02-3599-4241-ad13-7957f81567b4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="location" ><![CDATA[%dw 2.0
+output application/json
+---
+(payload.coord.lat ++ "," ++ payload.coord.lon) as String]]></ee:set-variable>
+				<ee:set-variable variableName="timestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+now() as Number]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="7905e839-177b-4fcb-a1e3-b5072b5cd8f3" config-ref="HTTP_timezoneAPI_Request_Configuration" path="${timezone.path}">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	location : vars.location ,
+	key : p("GoogleAPIKey"),
+	timestamp : vars.timestamp
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="d537a1fb-4815-41ec-b59a-65d8559c577d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="81d00748-dc61-4d4e-a001-2b35b27c2f58" message="timezone Response :  #[payload]"/>
+	</flow>
+	</mule>

@@ -1,0 +1,131 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": " The common Error structure returned by all APIs",
+	"type": "object",
+	"properties": {
+		"status": {
+			"type": "string"
+		},
+		"statusCode": {
+			"type": "string"
+		},
+		"statusDescription": {
+			"type": "string"
+		},
+		"creationDateTime": {
+			"type": "string"
+		},
+		"transactionId": {
+			"type": "string"
+		},
+		"error": {
+			"type": "object",
+			"$ref": "#/definitions/error"
+		}
+	},
+	"required": [
+		"status",
+		"statusCode",
+		"statusDescription",
+		"creationDateTime",
+		"transactionId"
+	],
+	"definitions": {
+		"error": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string"
+				},
+				"severity": {
+					"type": "string"
+				},
+				"details": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/ErrorDetails"
+					}
+				}
+			},
+			"required": [
+				"type"
+			]
+		},
+		"Errors": {
+			"type": "object"
+		},
+		"ErrorDetails": {
+			"type": "object",
+			"properties": {
+				"errorCode": {
+					"type": "string"
+				},
+				"externalSystemCode": {
+					"type": "string"
+				},
+				"message": {
+					"type": "string"
+				},
+				"context": {
+					"$ref": "#/definitions/ErrorContext"
+				}
+			},
+			"required": [
+				"errorCode"
+			]
+		},
+		"ErrorContext": {
+			"type": "object",
+			"properties": {
+				"dateTime": {
+					"type": "string"
+				},
+				"userName": {
+					"type": "string"
+				},
+				"additionalInfo": {
+					"$ref": "#/definitions/AdditionalInfo"
+				}
+			},
+			"required": [
+				"dateTime"
+			]
+		},
+		"AdditionalInfo": {
+			"type": "object",
+			"properties": {
+				"systemCode": {
+					"type": "string"
+				},
+				"serviceName": {
+					"type": "string"
+				},
+				"methodName": {
+					"type": "string"
+				},
+				"uri": {
+					"type": "string"
+				},
+				"attributes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"key": {
+								"type": "string"
+							},
+							"value": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"required": [
+				"serviceName",
+				"methodName",
+				"uri"
+			]
+		}
+	}
+}
